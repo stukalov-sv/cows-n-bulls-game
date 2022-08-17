@@ -101,29 +101,41 @@ def player_turn(update, _):
         if bulls == word_length:                                
             update.message.reply_text(
                 'You are win the game for ' + str(counter) + ' turns! Congratulations! Try again /start')    
-            return ConversationHandler.END 
-        reply_keyboard = [['Yes', 'No']]
-        markup_key = ReplyKeyboardMarkup(reply_keyboard, resize_keyboard=True, one_time_keyboard=True)                           
+            return ConversationHandler.END                           
         update.message.reply_text(
-            guess_word + ' includes ' + str(bulls) + ' bulls & ' + str(cows) + ' cows.' + '\nReady to enter new word?', reply_markup=markup_key)
+            guess_word + ' includes ' + str(bulls) + ' bulls & ' + str(cows) + ' cows.' + '\nEnter next word')
         return PLAYER_GUESS                
     else:
-        reply_keyboard = [['Yes', 'No']]
-        markup_key = ReplyKeyboardMarkup(reply_keyboard, resize_keyboard=True, one_time_keyboard=True)
         update.message.reply_text(
-            f"Incorrect data {update.message.text}.\nReady to enter new word?", reply_markup=markup_key)
+            f"Incorrect data {update.message.text}.\nReady to enter new word?")
         return PLAYER_GUESS
 
 
 def player_guess(update, _):
-    if update.message.text == 'Yes':
+    global word_length, first_name, counter
+    guess_word = update.message.text.split()
+    guess_word = ''.join(guess_word)
+
+    if len(guess_word) == word_length:
+        counter += 1                                     
+        bulls = 0 
+        cows = 0                          
+        for i in range(word_length):             
+            if word[i] == guess_word[i]:                       
+                bulls += 1                             
+            elif guess_word[i] in word:                         
+                cows += 1
+        if bulls == word_length:                                
+            update.message.reply_text(
+                'You are win the game for ' + str(counter) + ' turns! Congratulations! Try again /start')    
+            return ConversationHandler.END                           
         update.message.reply_text(
-            f"Good. Write your next word.\nOr /cancel to exit game", reply_markup=ReplyKeyboardRemove())
-        return PLAYER_TURN
+            guess_word + ' includes ' + str(bulls) + ' bulls & ' + str(cows) + ' cows.' + '\nEnter next word')
+        return PLAYER_TURN                
     else:
         update.message.reply_text(
-            'Good bye', reply_markup=ReplyKeyboardRemove())
-        return ConversationHandler.END
+            f"Incorrect data {update.message.text}.\nReady to enter new word?")
+        return PLAYER_TURN
 
 
 def cancel(update, _):
